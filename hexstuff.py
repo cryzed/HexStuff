@@ -9,9 +9,9 @@ BOLD_BYTE = '\x02'
 COLOR_BYTE = '\x03'
 BEEP_BYTE = '\x07'
 HIDDEN_BYTE = '\x10'
-ORIGINAL_ATTRIBUTES_BYTE = '\x17'
+ORIGINAL_ATTRIBUTE_BYTE = '\x17'
 REVERSE_COLOR_BYTE = '\x26'
-ITALICS_BYTE = '\x35'
+ITALIC_BYTE = '\x35'
 UNDERLINE_BYTE = '\x37'
 
 COLOR_WHITE = '00'
@@ -44,16 +44,16 @@ def hide_text(text):
     return ''.join((HIDDEN_BYTE, text, HIDDEN_BYTE))
 
 
-def original_attributes_text(text):
-    return ''.join((ORIGINAL_ATTRIBUTES_BYTE, text, ORIGINAL_ATTRIBUTES_BYTE))
+def original_attribute_text(text):
+    return ''.join((ORIGINAL_ATTRIBUTE_BYTE, text, ORIGINAL_ATTRIBUTE_BYTE))
 
 
 def reverse_color_text(text):
     return ''.join((REVERSE_COLOR_BYTE, text, REVERSE_COLOR_BYTE))
 
 
-def italics_text(text):
-    return ''.join((ITALICS_BYTE, text, ITALICS_BYTE))
+def italic_text(text):
+    return ''.join((ITALIC_BYTE, text, ITALIC_BYTE))
 
 
 def underline_text(text):
