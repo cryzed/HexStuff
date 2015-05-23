@@ -8,7 +8,7 @@ import sys
 BOLD_BYTE = '\x02'
 COLOR_BYTE = '\x03'
 BEEP_BYTE = '\x07'
-HIDDEN_BYTE = '\x10'
+HIDE_BYTE = '\x10'
 ORIGINAL_ATTRIBUTE_BYTE = '\x17'
 REVERSE_COLOR_BYTE = '\x26'
 ITALIC_BYTE = '\x35'
@@ -41,7 +41,7 @@ def color_text(text, color):
 
 
 def hide_text(text):
-    return ''.join((HIDDEN_BYTE, text, HIDDEN_BYTE))
+    return ''.join((HIDE_BYTE, text, HIDE_BYTE))
 
 
 def original_attribute_text(text):
