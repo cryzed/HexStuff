@@ -56,8 +56,8 @@ def safeguard(function):
                 traceback_string = ''.join(traceback.format_exception(
                     type(exception),
                     exception,
-                    exception.__traceback__)
-                )
+                    exception.__traceback__
+                ))
                 output_queue.put(lambda: hexchat.prnt(traceback_string))
 
     return wrapped_function
@@ -94,10 +94,11 @@ def match_imgur(url):
 def download_imgur(url, path):
     session = requests.Session()
     session.headers = {'User-Agent': preferences.user_agent}
+
     response = session.get(url, timeout=preferences.request_timeout)
     response.raise_for_status()
-
     soup = bs4.BeautifulSoup(response.text)
+
     image_urls = set()
     for meta in soup('meta', property='og:image'):
         image_url = meta['content'].rsplit('?', 1)[0]
@@ -107,7 +108,7 @@ def download_imgur(url, path):
         image_urls.add(image_url)
 
     multiple_images = len(image_urls) > 1
-    if multiple_images > 1:
+    if multiple_images:
         album_id = url.rsplit('/', 1)[1].rsplit('#', 1)[0]
         path = os.path.join(path, album_id)
         if not os.path.exists(path):
