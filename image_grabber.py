@@ -30,7 +30,7 @@ REQUEST_CHUNK_SIZE = 1048576
 OUTPUT_QUEUE_INTERVAL = 1000
 PREFERENCES_PREFIX = 'image_grabber'
 PREFERENCES = {
-    'path': os.path.join(os.path.expanduser('~'), 'Image Grabber'),
+    'path': os.path.join(os.path.expanduser('~'), __module_name__),
     'file_exists_mode': 'rename',
     'save_by_nickname': True,
     'download_threads': 5,
@@ -53,21 +53,14 @@ def safeguard(function):
             return function(*args, **kwargs)
         except Exception as exception:
             if preferences.debug:
-                traceback_string = ''.join(traceback.format_exception(
-                    type(exception),
-                    exception,
-                    exception.__traceback__
-                ))
-                output_queue.put(lambda: hexchat.prnt(traceback_string))
+                traceback_string = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+                output_queue.put(lambda: hexchat.emit_print('Generic Message', __module_name__, traceback_string))
 
     return wrapped_function
 
 
 def get_valid_windows_filename(string_, replacement=''):
-    return ''.join(
-        replacement if character in ILLEGAL_WINDOWS_FILENAME_CHARACTERS
-        else character for character in string_
-    )
+    return ''.join(replacement if character in ILLEGAL_WINDOWS_FILENAME_CHARACTERS else character for character in string_)
 
 
 def download_response(response, filename):
@@ -148,12 +141,7 @@ def process_text_event(data, context):
             continue
 
         try:
-            response = requests.get(
-                part,
-                headers={'User-Agent': preferences.user_agent},
-                stream=True,
-                timeout=preferences.request_timeout
-            )
+            response = requests.get(part, headers={'User-Agent': preferences.user_agent}, stream=True, timeout=preferences.request_timeout)
             response.raise_for_status()
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             parts[index] = hexstuff.color_text(part, hexstuff.COLOR_LIGHT_RED)
@@ -174,14 +162,10 @@ def process_text_event(data, context):
         return
 
     message = ' '.join(parts)
-    output_queue.put(lambda: context.emit_print('Generic Message', 'Image Grabber:', message))
+    output_queue.put(lambda: context.emit_print('Generic Message', __module_name__, message))
 
     channel = context.get_info('channel')
-    download_path = os.path.join(
-        preferences.path,
-        get_valid_windows_filename(context.get_info('network')),
-        get_valid_windows_filename(channel)
-    )
+    download_path = os.path.join(preferences.path, get_valid_windows_filename(context.get_info('network')), get_valid_windows_filename(channel))
 
     if preferences.save_by_nickname and channel.startswith('#'):
         download_path = os.path.join(download_path, hexchat.strip(data[0]))
@@ -205,11 +189,7 @@ def print_event_callback(word, word_eol, event_name):
 
     message = word[1]
     if 'http://' in message or 'https://' in message:
-        thread_pool_executor.submit(
-            process_text_event,
-            word,
-            hexchat.get_context()
-        )
+        thread_pool_executor.submit(process_text_event, word, hexchat.get_context())
 
     emitting = True
     hexchat.emit_print(event_name, *word)
