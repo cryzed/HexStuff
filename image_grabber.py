@@ -135,7 +135,7 @@ def process_text_event(data, context):
     responses = []
     for index, part in enumerate(parts):
         part = hexchat.strip(part).strip(',')
-        if not (part.startswith('http://') or part.startswith('https://')):
+        if not part.startswith('http://') and not part.startswith('https://'):
             continue
 
         matched = False
