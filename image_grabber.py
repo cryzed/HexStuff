@@ -112,7 +112,7 @@ def download_imgur(url, path):
         if multiple_images and os.path.exists(filename):
             continue
 
-        response = session.get(meta['content'], stream=True, timeout=preferences.request_timeout)
+        response = session.get(image_url, stream=True, timeout=preferences.request_timeout)
         download_response(response, filename)
 
 
