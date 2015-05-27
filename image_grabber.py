@@ -53,14 +53,21 @@ def safeguard(function):
             return function(*args, **kwargs)
         except Exception as exception:
             if preferences.debug:
-                traceback_string = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+                traceback_string = ''.join(traceback.format_exception(
+                    type(exception),
+                    exception,
+                    exception.__traceback__
+                ))
                 output_queue.put(lambda: hexchat.emit_print('Generic Message', __module_name__, traceback_string))
 
     return wrapped_function
 
 
 def get_valid_windows_filename(string_, replacement=''):
-    return ''.join(replacement if character in ILLEGAL_WINDOWS_FILENAME_CHARACTERS else character for character in string_)
+    return ''.join(
+        replacement if character in ILLEGAL_WINDOWS_FILENAME_CHARACTERS
+        else character for character in string_
+    )
 
 
 def download_response(response, filename):
@@ -94,7 +101,7 @@ def download_imgur(url, path):
 
     image_urls = set()
     for meta in soup('meta', property='og:image'):
-        image_url = meta['content'].rsplit('?', 1)[0]
+        image_url = meta['content'].split('?', 1)[0]
         if image_url in image_urls:
             continue
 
@@ -112,7 +119,11 @@ def download_imgur(url, path):
         if multiple_images and os.path.exists(filename):
             continue
 
-        response = session.get(image_url, stream=True, timeout=preferences.request_timeout)
+        response = session.get(
+            image_url,
+            stream=True,
+            timeout=preferences.request_timeout
+        )
         download_response(response, filename)
 
 
@@ -141,7 +152,12 @@ def process_text_event(data, context):
             continue
 
         try:
-            response = requests.get(part, headers={'User-Agent': preferences.user_agent}, stream=True, timeout=preferences.request_timeout)
+            response = requests.get(
+                part,
+                headers={'User-Agent': preferences.user_agent},
+                stream=True,
+                timeout=preferences.request_timeout
+            )
             response.raise_for_status()
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             parts[index] = hexstuff.color_text(part, hexstuff.COLOR_LIGHT_RED)
@@ -165,7 +181,11 @@ def process_text_event(data, context):
     output_queue.put(lambda: context.emit_print('Generic Message', __module_name__, message))
 
     channel = context.get_info('channel')
-    download_path = os.path.join(preferences.path, get_valid_windows_filename(context.get_info('network')), get_valid_windows_filename(channel))
+    download_path = os.path.join(
+        preferences.path,
+        get_valid_windows_filename(context.get_info('network')),
+        get_valid_windows_filename(channel)
+    )
 
     if preferences.save_by_nickname and channel.startswith('#'):
         download_path = os.path.join(download_path, hexchat.strip(data[0]))
